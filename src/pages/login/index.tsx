@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import {auth} from '../../services/fireBaseConnection';
+
 import {Input} from '../../components/Input'
 import { useState, type FormEvent } from "react";
 
