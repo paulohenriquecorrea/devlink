@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {auth} from '../../services/fireBaseConnection';
+import {signInWithEmailAndPassword} from 'firebase/auth';
 
 import {Input} from '../../components/Input'
 import { useState, type FormEvent } from "react";
@@ -8,16 +9,27 @@ import { useState, type FormEvent } from "react";
 export function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     function handleSubmit(e: FormEvent) {
         e.preventDefault();
 
-        console.log(
-            {
-                email: email,
-                password: password
-            }
-        )
+        // Verifica se há email e senha antes de chamar o firestore para fazer a conexão 
+        if (email == '' || password == ''){
+            alert('Preencha todos os campos!');
+            return;
+        }
+
+        signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+            console.log('Logado com sucesso!');
+            navigate('/admin', { replace: true});
+            
+        })
+        .catch((error) => {
+            console.log('ERRO AO FAZER O LOGIN:');
+            console.log(error);
+        })
     } 
 
     return(
