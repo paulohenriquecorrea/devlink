@@ -1,4 +1,4 @@
-import {useState, type FormEvent} from 'react';
+import {useState, useEffect, type FormEvent} from 'react';
 import { Header } from "../../components/Header";
 import { Input } from "../../components/Input";
 
@@ -17,11 +17,47 @@ import {
 
 } from 'firebase/firestore';
 
+interface LinksProps {
+    id: string,
+    name: string,
+    url: string,
+    bg: string,
+    color: string
+}
+
 export function Admin(){
     const [nameInput, setNameInput] = useState("");
     const [urlInput, setUrlInput] = useState("");
     const [textColorInput, setTextColorInput] = useState("#f1f1f1");
     const [backGroundColorInput, setBackGroundColorInput] = useState("#121212");
+    const [links, setLinks] = useState<LinksProps[]>([]);
+
+    useEffect(() => {
+        const linksRef = collection(db, "links");
+        const queryRef = query(linksRef, orderBy("created", "asc"));
+
+        const unsub = onSnapshot(queryRef, (snapshot) => {
+            let lista = [] as LinksProps[]; // ou let lista: LinksProps[] = []; 
+
+            snapshot.forEach((doc) => {
+                lista.push({
+                    id: doc.id,
+                    name: doc.data().name,
+                    url: doc.data().url,
+                    bg: doc.data().bg,
+                    color: doc.data().color
+                })
+            })
+            
+            setLinks(lista);
+        })
+
+
+        return () => { // É uma função anônima de unmount 
+            unsub();
+        }
+
+    }, [])
 
     function handleRegister(e: FormEvent) {
         e.preventDefault();
